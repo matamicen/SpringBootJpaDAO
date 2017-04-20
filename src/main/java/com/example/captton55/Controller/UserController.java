@@ -4,9 +4,14 @@ package com.example.captton55.Controller;
 import com.example.captton55.model.User;
 import com.example.captton55.model.UserDao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -16,11 +21,36 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 public class UserController {
-
+    Logger log = LoggerFactory.getLogger(this.getClass());
     // ------------------------
     // PUBLIC METHODS
     // ------------------------
+    @RequestMapping(value="/create", method= RequestMethod.GET)
+    public String customerForm(Model model) {
+        model.addAttribute("user", new User());
+        return "create";
+    }
 
+    @RequestMapping(value="/create", method=RequestMethod.POST)
+    public String customerSubmit(@ModelAttribute User user, Model model) {
+
+        User user2 = null;
+        try {
+            user2 = new User(user.getEmail(), user.getName());
+            userDao.save(user);
+        }
+        catch (Exception ex) {
+            return "Error creating the user: " + ex.toString();
+        }
+
+
+        model.addAttribute("user", user);
+        String info = String.format("Customer Submission: id = %d, firstname = %s, lastname = %s",
+                user.getId(), user.getEmail(), user.getName());
+        log.info(info);
+
+        return "result";
+    }
     /**
      * /create  --> Create a new user and save it in the database.
      *
@@ -28,7 +58,7 @@ public class UserController {
      * @param name User's name
      * @return A string describing if the user is succesfully created or not.
      */
-    @RequestMapping("/create")
+  /*  @RequestMapping("/create")
     @ResponseBody
     public String create(String email, String name) {
         User user = null;
@@ -41,6 +71,7 @@ public class UserController {
         }
         return "User succesfully created! (id = " + user.getId() + ")";
     }
+*/
 
     /**
      * /delete  --> Delete the user having the passed id.
@@ -81,12 +112,7 @@ public class UserController {
         return "The user id is: " + userId;
     }
 
-    /**
-     * /get-by-email  --> Return the id for the user having the passed email.
-     *
-     * @param email The email to search in the database.
-     * @return The user id or a message error if the user is not found.
-     */
+
     @RequestMapping("/getbyname")
     @ResponseBody
     public String getByPepe(String name) {
