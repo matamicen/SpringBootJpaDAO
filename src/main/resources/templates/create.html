@@ -1,14 +1,33 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Form Submission</title>
+    <title>Form joseeeeee Submission</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" type="text/css"
           href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
 
 </head>
 <body>
-<h1>Customer Form</h1>
+<h1>Customer 888 Form</h1>
+<p th:text="${session.mySessionAttribute}" th:unless="${session == null}">[...]</p>
+
+
+<table>
+    <tr>
+        <td>Lista de usuarios</td>
+
+
+    </tr>
+  <!--  <tr th:each="lista : ${session.ListaUsers}">
+        <td th:text="${lista.name}">${lista.name}</td> -->
+    <tr th:each="lista : ${ListaUsers}">
+        <td th:text="${lista.name}">${lista.name}</td>
+
+
+    </tr>
+</table>
+
+
 <form action="#" th:action="@{/create}" th:object="${user}" method="post">
     <p>Id: <input type="text" th:field="*{id}" /></p>
     <p>First Name: <input type="text" th:field="*{name}" /></p>

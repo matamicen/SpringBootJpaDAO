@@ -14,6 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionContext;
+import java.util.ArrayList;
+import java.util.Enumeration;
+
+
+
 /**
  * A class to test interactions with the MySQL database using the UserDao class.
  *
@@ -22,22 +31,38 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class UserController {
     Logger log = LoggerFactory.getLogger(this.getClass());
+
+    HttpSession session;
+   ArrayList<User> ListaUsuarios;
+
+
     // ------------------------
     // PUBLIC METHODS
     // ------------------------
     @RequestMapping(value="/create", method= RequestMethod.GET)
-    public String customerForm(Model model) {
+    public String customerForm(Model model, HttpServletRequest request) {
         model.addAttribute("user", new User());
+        session = request.getSession();
+        model.addAttribute("ListaUsers", ListaUsuarios);
+
+
         return "create";
     }
 
     @RequestMapping(value="/create", method=RequestMethod.POST)
-    public String customerSubmit(@ModelAttribute User user, Model model) {
+    public String customerSubmit(@ModelAttribute User user, Model model, HttpServletRequest request) {
 
         User user2 = null;
         try {
             user2 = new User(user.getEmail(), user.getName());
             userDao.save(user);
+            session = request.getSession();
+            session.setAttribute("mySessionAttribute", user.getName());
+            //ListaUsuarios = (ArrayList<User>) session.getAttribute("ListaUsers");
+            if (ListaUsuarios==null) ListaUsuarios = new ArrayList<User>();
+            ListaUsuarios.add(user);
+           // model.addAttribute("ListaUsers", ListaUsuarios);
+           // session.setAttribute("ListaUsers", ListaUsuarios);
         }
         catch (Exception ex) {
             return "Error creating the user: " + ex.toString();
@@ -150,6 +175,8 @@ public class UserController {
         }
         return "User succesfully updated!";
     }
+
+
 
     // ------------------------
     // PRIVATE FIELDS
